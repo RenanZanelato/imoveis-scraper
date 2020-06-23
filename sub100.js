@@ -8,6 +8,14 @@ const { googleMapsToken, dadosCalcularDistancia } = require("./config");
 const { error, warn, success, messageWithColor, Colors } = require("./lib/console-colorhelper");
 const apiGoogleMaps = require("./lib/api-google-maps");
 const CsvWriter = require("./lib/csv-writer");
+const argv = require("yargs");
+
+const args = argv.option('estado', {
+    description: 'Estado',
+    default: "PR"
+  })
+  .help()
+  .argv;
 
 if (process.argv.length < 3) {
     console.log('Utilização: node ' + process.argv[1] + ' <lista-de-links.txt>');
@@ -63,7 +71,6 @@ const liner = new readlines(filename);
             console.log(success(`Iniciando consulta (${lineNumber})`));
 
             const url = line.toString();
-
             if (!url) {
                 break;
             }
@@ -104,15 +111,9 @@ async function getHtml(url) {
     return fetch(url, {
         method: 'get',
         headers: {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng;q=0.8,application/signed-exchange;v=b3',
-            'Accept-Encoding': 'gzip, deflate',
-            'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Cache-Control': 'max-age=0',
-            'Connection': 'keep-alive',
-            'Cookie': 'getestado=PR;',
-            'Host': 'www.sub100.com.br',
-            'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
+
+            'Cookie': 'getestado='+args.estado+';',
+
         },
     })
     .then(res => res.arrayBuffer())
